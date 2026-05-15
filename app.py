@@ -52,6 +52,10 @@ def add_to_history(url, analysis, success=True):
 def index():
     return send_from_directory('.', 'index.html')
 
+@app.route('/logo.png')
+def logo():
+    return send_from_directory('.', 'logo.png')
+
 @app.route('/api/history', methods=['GET'])
 def get_history():
     """Get analysis history"""
