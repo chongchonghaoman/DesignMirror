@@ -53,6 +53,23 @@ Open [http://localhost:5002](http://localhost:5002) in your browser.
 3. View extracted design tokens (Colors, Typography, Spacing, Border Radius)
 4. Copy CSS variables to your project
 
+## Showcase
+
+Example projects built with DesignMirror design tokens:
+
+### [TikTok Brand Hub](./showcase/tiktok-brand.html)
+
+A TikTok-inspired brand landing page demonstrating:
+
+- Dark theme with warm golden accents (`#7AD1DD`, `#FF00A1`, `#FFC65D`)
+- Poppins/Barlow Condensed/Inter typography
+- Coverflow carousel showcase
+- Glass morphism navigation
+- Floating animations and micro-interactions
+- Dark/Light mode toggle
+
+Open `showcase/tiktok-brand.html` directly in a browser to preview.
+
 ## Tech Stack
 
 - **Frontend**: Tailwind CSS + Vanilla JS

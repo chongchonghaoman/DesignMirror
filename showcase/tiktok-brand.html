@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikTok Brand Hub - Creative Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600&family=Inter:wght@400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#7AD1DD',
+            accent: '#FF00A1',
+            'accent-warm': '#FFC65D',
+            cream: '#FFF3CF',
+            surface: 'rgba(255, 255, 255, 0.05)',
+            'surface-secondary': 'rgba(255, 255, 255, 0.08)',
+            'text-secondary': 'rgba(255, 255, 255, 0.6)',
+            'border-hair': 'rgba(255, 255, 255, 0.12)',
+          },
+          fontFamily: {
+            display: ['Poppins', 'system-ui', 'sans-serif'],
+            heading: ['Barlow Condensed', 'system-ui', 'sans-serif'],
+            body: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          borderRadius: {
+            'sm': '8px',
+            'md': '12px',
+            'lg': '16px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --color-primary: #7AD1DD;
+      --color-accent: #FF00A1;
+      --color-accent-warm: #FFC65D;
+      --color-background: #0A0A0F;
+      --color-surface: rgba(255, 255, 255, 0.05);
+      --color-surface-secondary: rgba(255, 255, 255, 0.08);
+      --color-text-primary: #FFFFFF;
+      --color-text-secondary: rgba(255, 255, 255, 0.6);
+      --color-border: rgba(255, 255, 255, 0.12);
+      --shadow-card: 0 0 50px 0 rgba(0, 0, 0, 0.25);
+    }
+
+    :root:not(.dark) {
+      --color-background: #FFFFFF;
+      --color-surface: rgba(0, 0, 0, 0.05);
+      --color-surface-secondary: rgba(0, 0, 0, 0.08);
+      --color-text-primary: #1A1A1A;
+      --color-text-secondary: rgba(0, 0, 0, 0.6);
+      --color-border: rgba(0, 0, 0, 0.12);
+      --shadow-card: 0 8px 16px 0 rgba(0, 0, 0, 0.18), 0 2px 4px 0 rgba(0, 0, 0, 0.10);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--color-background);
+      color: var(--color-text-primary);
+      line-height: 1.6;
+      min-height: 100dvh;
+    }
+
+    ::selection { background: var(--color-primary); color: #0A0A0F; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+
+    /* Gradient Text */
+    .gradient-text {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Card Hover */
+    .card-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card);
+    }
+
+    /* Floating Animation */
+    .float { animation: float 6s ease-in-out infinite; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+
+    /* Pulse Dot */
+    .pulse-dot {
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.9); }
+    }
+
+    /* Shimmer Skeleton */
+    .shimmer {
+      background: linear-gradient(90deg, var(--color-surface) 0%, var(--color-surface-secondary) 50%, var(--color-surface) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Button Press */
+    .btn-press:active { transform: scale(0.97); }
+
+    /* Glass Effect */
+    .glass {
+      background: var(--color-surface);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--color-border);
+    }
+
+    /* Glow Effect */
+    .glow-primary { box-shadow: 0 0 30px rgba(122, 209, 221, 0.3); }
+    .glow-accent { box-shadow: 0 0 30px rgba(255, 0, 161, 0.3); }
+
+    /* Coverflow Carousel */
+    .coverflow-track {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      padding: 40px 0;
+    }
+    .coverflow-track::-webkit-scrollbar { display: none; }
+    .coverflow-item {
+      flex: 0 0 300px;
+      scroll-snap-align: center;
+      transition: all 0.4s ease;
+    }
+    .coverflow-item:hover {
+      transform: scale(1.05);
+    }
+    .coverflow-item:nth-child(odd) { transform: scale(0.95) translateY(10px); }
+    .coverflow-item:nth-child(even) { transform: scale(0.95) translateY(-10px); }
+    .coverflow-item:hover { transform: scale(1.05) translateY(0); }
+  </style>
+</head>
+<body class="antialiased">
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-50 glass">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-[#7AD1DD] to-[#FF00A1] flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/>
+          </svg>
+        </div>
+        <span class="font-display font-semibold text-lg tracking-tight">TikTok Hub</span>
+      </div>
+
+      <div class="flex items-center gap-6">
+        <a href="#features" class="hidden md:block text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">Features</a>
+        <a href="#showcase" class="hidden md:block text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">Showcase</a>
+        <a href="#about" class="hidden md:block text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">About</a>
+        <button
+          id="themeToggle"
+          class="w-9 h-9 rounded-lg bg-[var(--color-surface)] flex items-center justify-center hover:bg-[var(--color-surface-secondary)] transition-colors btn-press"
+          aria-label="Toggle theme"
+        >
+          <svg id="sunIcon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+          <svg id="moonIcon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="pt-16">
+
+    <!-- Hero Section -->
+    <section class="min-h-[100dvh] flex items-center relative overflow-hidden">
+      <!-- Background Gradient Orbs -->
+      <div class="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-[#7AD1DD]/20 rounded-full blur-[120px] pointer-events-none"></div>
+      <div class="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-[#FF00A1]/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+      <div class="relative z-10 max-w-7xl mx-auto px-6 py-24 w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+          <!-- Left: Content -->
+          <div class="space-y-8 fade-in">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]">
+              <span class="w-2 h-2 rounded-full bg-[#7AD1DD] pulse-dot"></span>
+              <span class="text-xs text-[var(--color-text-secondary)]">Creative Platform</span>
+            </div>
+
+            <h1 class="font-display text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]">
+              Where Ideas<br>
+              <span class="gradient-text">Come Alive</span>
+            </h1>
+
+            <p class="text-lg text-[var(--color-text-secondary)] max-w-[480px] leading-relaxed">
+              Discover the next generation of creative expression. Join millions of creators sharing their story, one video at a time.
+            </p>
+
+            <div class="flex flex-wrap gap-4">
+              <a href="#showcase" class="px-6 py-3 bg-[#FF00A1] text-white rounded-xl font-medium text-sm flex items-center gap-2 hover:opacity-90 transition-opacity btn-press glow-accent">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <polygon points="5 3 19 12 5 21 5 3"/>
+                </svg>
+                Explore Now
+              </a>
+              <a href="#about" class="px-6 py-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl font-medium text-sm text-white hover:bg-[var(--color-surface-secondary)] transition-colors btn-press">
+                Learn More
+              </a>
+            </div>
+
+            <!-- Stats -->
+            <div class="flex gap-8 pt-4">
+              <div>
+                <p class="font-display text-3xl font-bold">1B+</p>
+                <p class="text-sm text-[var(--color-text-secondary)]">Active Users</p>
+              </div>
+              <div>
+                <p class="font-display text-3xl font-bold">150+</p>
+                <p class="text-sm text-[var(--color-text-secondary)]">Countries</p>
+              </div>
+              <div>
+                <p class="font-display text-3xl font-bold">70M</p>
+                <p class="text-sm text-[var(--color-text-secondary)]">Creators</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Visual -->
+          <div class="hidden lg:block relative">
+            <div class="relative w-full aspect-square max-w-md mx-auto">
+              <!-- Phone Mockup -->
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="w-64 h-[500px] rounded-[3rem] bg-[#1A1A1A] border-4 border-[#333] shadow-2xl overflow-hidden">
+                  <div class="h-6 bg-[#0A0A0F] flex items-center justify-center">
+                    <div class="w-20 h-6 bg-black rounded-full"></div>
+                  </div>
+                  <div class="flex-1 bg-gradient-to-br from-[#7AD1DD]/20 to-[#FF00A1]/20 flex items-center justify-center">
+                    <div class="text-center space-y-4 p-8">
+                      <div class="w-20 h-20 rounded-full bg-gradient-to-br from-[#7AD1DD] to-[#FF00A1] mx-auto flex items-center justify-center">
+                        <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/>
+                        </svg>
+                      </div>
+                      <p class="text-white/80 text-sm font-heading">@creator</p>
+                      <p class="text-white/60 text-xs">Tap to follow</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Floating Elements -->
+              <div class="absolute -top-4 -right-4 px-4 py-2 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-lg float" style="animation-delay: 0s;">
+                <div class="flex items-center gap-2">
+                  <span class="text-[#FF00A1]">●</span>
+                  <span class="text-xs font-medium">Live</span>
+                </div>
+              </div>
+              <div class="absolute -bottom-4 -left-4 px-4 py-2 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-lg float" style="animation-delay: 0.3s;">
+                <div class="flex items-center gap-2">
+                  <span class="text-[#FFC65D]">★</span>
+                  <span class="text-xs font-medium">Trending</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-24 relative">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <p class="text-xs font-medium text-[#7AD1DD] uppercase tracking-wider mb-3">Why TikTok</p>
+          <h2 class="font-display text-4xl md:text-5xl font-bold tracking-tight">Built for Creators</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          <!-- Feature Card 1 -->
+          <div class="group p-8 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] card-hover">
+            <div class="w-12 h-12 rounded-xl bg-[#7AD1DD]/10 flex items-center justify-center mb-6 group-hover:glow-primary transition-shadow">
+              <svg class="w-6 h-6 text-[#7AD1DD]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <h3 class="font-heading text-xl font-semibold mb-3">Video Creation</h3>
+            <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+              Powerful editing tools, filters, and effects. Create professional content with just your phone.
+            </p>
+          </div>
+
+          <!-- Feature Card 2 -->
+          <div class="group p-8 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] card-hover">
+            <div class="w-12 h-12 rounded-xl bg-[#FF00A1]/10 flex items-center justify-center mb-6 group-hover:glow-accent transition-shadow">
+              <svg class="w-6 h-6 text-[#FF00A1]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </div>
+            <h3 class="font-heading text-xl font-semibold mb-3">Community</h3>
+            <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+              Connect with creators worldwide. Join tribes, participate in challenges, grow your following.
+            </p>
+          </div>
+
+          <!-- Feature Card 3 -->
+          <div class="group p-8 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] card-hover">
+            <div class="w-12 h-12 rounded-xl bg-[#FFC65D]/10 flex items-center justify-center mb-6">
+              <svg class="w-6 h-6 text-[#FFC65D]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <h3 class="font-heading text-xl font-semibold mb-3">Monetization</h3>
+            <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+              Earn from your content through brand deals, live gifts, and the Creator Fund program.
+            </p>
+          </div>
+
+          <!-- Feature Card 4 -->
+          <div class="group p-8 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] card-hover">
+            <div class="w-12 h-12 rounded-xl bg-[#7AD1DD]/10 flex items-center justify-center mb-6">
+              <svg class="w-6 h-6 text-[#7AD1DD]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
+            </div>
+            <h3 class="font-heading text-xl font-semibold mb-3">Analytics</h3>
+            <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+              Deep insights into your audience. Understand what content performs best and when.
+            </p>
+          </div>
+
+          <!-- Feature Card 5 -->
+          <div class="group p-8 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] card-hover">
+            <div class="w-12 h-12 rounded-xl bg-[#FF00A1]/10 flex items-center justify-center mb-6">
+              <svg class="w-6 h-6 text-[#FF00A1]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <h3 class="font-heading text-xl font-semibold mb-3">Effects Library</h3>
+            <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+              Thousands of filters, stickers, and AR effects. New content added daily by our team.
+            </p>
+          </div>
+
+          <!-- Feature Card 6 -->
+          <div class="group p-8 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] card-hover">
+            <div class="w-12 h-12 rounded-xl bg-[#FFC65D]/10 flex items-center justify-center mb-6">
+              <svg class="w-6 h-6 text-[#FFC65D]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <h3 class="font-heading text-xl font-semibold mb-3">Global Reach</h3>
+            <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+              Go viral across 150+ countries. Multi-language support and localized content discovery.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Showcase / Coverflow Section -->
+    <section id="showcase" class="py-24 bg-[var(--color-surface)]">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="flex items-end justify-between mb-12">
+          <div>
+            <p class="text-xs font-medium text-[#FF00A1] uppercase tracking-wider mb-3">Trending Now</p>
+            <h2 class="font-display text-4xl md:text-5xl font-bold tracking-tight">Featured Creators</h2>
+          </div>
+          <a href="#" class="hidden md:flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-white transition-colors">
+            View All
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+
+        <div class="coverflow-track">
+          <!-- Creator Card 1 -->
+          <div class="coverflow-item">
+            <div class="rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] overflow-hidden card-hover">
+              <div class="aspect-[4/5] bg-gradient-to-br from-[#7AD1DD]/30 to-[#FF00A1]/30 flex items-center justify-center">
+                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-[#7AD1DD] to-[#FF00A1] flex items-center justify-center">
+                  <span class="text-3xl font-display font-bold text-white">K</span>
+                </div>
+              </div>
+              <div class="p-6">
+                <h3 class="font-heading text-lg font-semibold">@kyliejenner</h3>
+                <p class="text-sm text-[var(--color-text-secondary)] mt-1">Beauty & Lifestyle</p>
+                <div class="flex items-center gap-4 mt-4">
+                  <span class="text-xs text-[var(--color-text-secondary)]">2.3M followers</span>
+                  <span class="text-xs text-[#FFC65D]">★ Trending</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Creator Card 2 -->
+          <div class="coverflow-item">
+            <div class="rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] overflow-hidden card-hover">
+              <div class="aspect-[4/5] bg-gradient-to-br from-[#FF00A1]/30 to-[#FFC65D]/30 flex items-center justify-center">
+                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-[#FF00A1] to-[#FFC65D] flex items-center justify-center">
+                  <span class="text-3xl font-display font-bold text-white">M</span>
+                </div>
+              </div>
+              <div class="p-6">
+                <h3 class="font-heading text-lg font-semibold">@mrbeast</h3>
+                <p class="text-sm text-[var(--color-text-secondary)] mt-1">Entertainment</p>
+                <div class="flex items-center gap-4 mt-4">
+                  <span class="text-xs text-[var(--color-text-secondary)]">89M followers</span>
+                  <span class="text-xs text-[#7AD1DD]">● Live</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Creator Card 3 -->
+          <div class="coverflow-item">
+            <div class="rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] overflow-hidden card-hover">
+              <div class="aspect-[4/5] bg-gradient-to-br from-[#FFC65D]/30 to-[#7AD1DD]/30 flex items-center justify-center">
+                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-[#FFC65D] to-[#7AD1DD] flex items-center justify-center">
+                  <span class="text-3xl font-display font-bold text-white">C</span>
+                </div>
+              </div>
+              <div class="p-6">
+                <h3 class="font-heading text-lg font-semibold">@charlidamelio</h3>
+                <p class="text-sm text-[var(--color-text-secondary)] mt-1">Dance & Lifestyle</p>
+                <div class="flex items-center gap-4 mt-4">
+                  <span class="text-xs text-[var(--color-text-secondary)]">150M followers</span>
+                  <span class="text-xs text-[#FFC65D]">★ Featured</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Creator Card 4 -->
+          <div class="coverflow-item">
+            <div class="rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] overflow-hidden card-hover">
+              <div class="aspect-[4/5] bg-gradient-to-br from-[#7AD1DD]/30 to-[#FF00A1]/30 flex items-center justify-center">
+                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-[#7AD1DD] to-[#FF00A1] flex items-center justify-center">
+                  <span class="text-3xl font-display font-bold text-white">Z</span>
+                </div>
+              </div>
+              <div class="p-6">
+                <h3 class="font-heading text-lg font-semibold">@zachary</h3>
+                <p class="text-sm text-[var(--color-text-secondary)] mt-1">Comedy</p>
+                <div class="flex items-center gap-4 mt-4">
+                  <span class="text-xs text-[var(--color-text-secondary)]">12M followers</span>
+                  <span class="text-xs text-[#FF00A1]">● New</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Creator Card 5 -->
+          <div class="coverflow-item">
+            <div class="rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] overflow-hidden card-hover">
+              <div class="aspect-[4/5] bg-gradient-to-br from-[#FF00A1]/30 to-[#7AD1DD]/30 flex items-center justify-center">
+                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-[#FF00A1] to-[#7AD1DD] flex items-center justify-center">
+                  <span class="text-3xl font-display font-bold text-white">A</span>
+                </div>
+              </div>
+              <div class="p-6">
+                <h3 class="font-heading text-lg font-semibold">@addisonre</h3>
+                <p class="text-sm text-[var(--color-text-secondary)] mt-1">Dance</p>
+                <div class="flex items-center gap-4 mt-4">
+                  <span class="text-xs text-[var(--color-text-secondary)]">88M followers</span>
+                  <span class="text-xs text-[#7AD1DD]">● Active</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-24">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+          <div>
+            <p class="text-xs font-medium text-[#7AD1DD] uppercase tracking-wider mb-3">About Us</p>
+            <h2 class="font-display text-4xl md:text-5xl font-bold tracking-tight mb-6">
+              More Than an App.<br>
+              <span class="gradient-text">A Movement.</span>
+            </h2>
+            <p class="text-[var(--color-text-secondary)] leading-relaxed mb-6">
+              TikTok is the leading destination for short-form mobile video. Our mission is to inspire creativity and bring joy.
+            </p>
+            <p class="text-[var(--color-text-secondary)] leading-relaxed mb-8">
+              We believe in the power of short videos to connect people, share stories, and shape culture. Every day, millions of people discover something new on TikTok - from creators they love to ideas that surprise and delight them.
+            </p>
+
+            <div class="grid grid-cols-2 gap-6">
+              <div class="p-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)]">
+                <p class="font-display text-2xl font-bold text-[#7AD1DD]">2016</p>
+                <p class="text-sm text-[var(--color-text-secondary)]">Founded</p>
+              </div>
+              <div class="p-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)]">
+                <p class="font-display text-2xl font-bold text-[#FF00A1]">Beijing</p>
+                <p class="text-sm text-[var(--color-text-secondary)]">Headquarters</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="relative">
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="p-6 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] card-hover">
+                <p class="font-display text-4xl font-bold gradient-text">1B+</p>
+                <p class="text-sm text-[var(--color-text-secondary)] mt-2">Monthly Active Users</p>
+              </div>
+              <div class="p-6 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] card-hover">
+                <p class="font-display text-4xl font-bold text-[#FF00A1]">150+</p>
+                <p class="text-sm text-[var(--color-text-secondary)] mt-2">Countries Supported</p>
+              </div>
+              <div class="p-6 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] card-hover">
+                <p class="font-display text-4xl font-bold text-[#FFC65D]">70M</p>
+                <p class="text-sm text-[var(--color-text-secondary)] mt-2">Content Creators</p>
+              </div>
+              <div class="p-6 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] card-hover">
+                <p class="font-display text-4xl font-bold text-white">#1</p>
+                <p class="text-sm text-[var(--color-text-secondary)] mt-2">App Store Ranking</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-24">
+      <div class="max-w-4xl mx-auto px-6 text-center">
+        <div class="p-12 md:p-16 rounded-3xl bg-gradient-to-br from-[#7AD1DD]/10 to-[#FF00A1]/10 border border-[var(--color-border)] relative overflow-hidden">
+          <!-- Background Glow -->
+          <div class="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#7AD1DD]/20 rounded-full blur-[80px] pointer-events-none"></div>
+
+          <div class="relative z-10">
+            <h2 class="font-display text-4xl md:text-5xl font-bold tracking-tight mb-6">
+              Ready to Create?
+            </h2>
+            <p class="text-[var(--color-text-secondary)] max-w-xl mx-auto mb-8">
+              Join millions of creators already sharing their story. Download TikTok and start your creative journey today.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+              <a href="#" class="px-8 py-4 bg-[#FF00A1] text-white rounded-xl font-medium flex items-center gap-3 hover:opacity-90 transition-opacity btn-press glow-accent">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+                Get TikTok
+              </a>
+              <a href="#" class="px-8 py-4 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl font-medium text-white hover:bg-[var(--color-surface-secondary)] transition-colors btn-press">
+                Learn More
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-12 border-t border-[var(--color-border)]">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#7AD1DD] to-[#FF00A1] flex items-center justify-center">
+            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/>
+            </svg>
+          </div>
+          <span class="font-display font-semibold">TikTok Hub</span>
+        </div>
+
+        <div class="flex items-center gap-6 text-sm text-[var(--color-text-secondary)]">
+          <a href="#" class="hover:text-white transition-colors">Privacy</a>
+          <a href="#" class="hover:text-white transition-colors">Terms</a>
+          <a href="#" class="hover:text-white transition-colors">Creator Portal</a>
+          <a href="#" class="hover:text-white transition-colors">Contact</a>
+        </div>
+
+        <p class="text-sm text-[var(--color-text-secondary)]">
+          © 2024 TikTok Brand Hub. All rights reserved.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-full text-sm opacity-0 translate-y-2 transition-all duration-300 pointer-events-none z-50">
+    <span id="toastMessage">Copied!</span>
+  </div>
+
+  <script>
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const sunIcon = document.getElementById('sunIcon');
+    const moonIcon = document.getElementById('moonIcon');
+
+    themeToggle.addEventListener('click', () => {
+      const isDark = html.classList.contains('dark');
+      html.classList.toggle('dark');
+      sunIcon.classList.toggle('hidden', isDark);
+      moonIcon.classList.toggle('hidden', !isDark);
+      showToast(isDark ? 'Light mode' : 'Dark mode');
+    });
+
+    // Toast
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      toastMessage.textContent = message;
+      toast.classList.remove('opacity-0', 'translate-y-2');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+      }, 2000);
+    }
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
