@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DesignMirror - AI Design System Analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Geist', 'Inter', 'system-ui', 'sans-serif'],
+            mono: ['Geist Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            canvas: '#0a0a0a',
+            'canvas-soft': '#141414',
+            'canvas-soft-2': '#1a1a1a',
+            ink: '#171717',
+            body: '#4d4d4d',
+            mute: '#888888',
+            hairline: '#ebebeb',
+            'hairline-strong': '#a1a1a1',
+            link: '#0070f3',
+            'link-deep': '#0761d1',
+            cyan: '#50e3c2',
+            violet: '#7928ca',
+            'highlight-pink': '#ff0080',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font-sans); background: #0a0a0a; color: #ffffff; line-height: 1.6; min-height: 100dvh; }
+    ::selection { background: #171717; color: #f2f2f2; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #0a0a0a; }
+    ::-webkit-scrollbar-thumb { background: #a1a1a1; border-radius: 4px; }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #007cf0, #00dfd8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .input-glow:focus {
+      box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.15);
+    }
+
+    .btn-press:active { transform: translateY(1px) scale(0.98); }
+
+    .magnetic-btn { transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+
+    .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .shimmer { background: linear-gradient(90deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    .float { animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+    .pulse-dot { animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    .spin { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .code-block { font-family: 'Geist Mono', monospace; }
+  </style>
+</head>
+<body class="antialiased">
+
+  <!-- Header -->
+  <header class="fixed top-0 left-0 right-0 h-16 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-[#ebebeb]/10 z-50 flex items-center justify-between px-6">
+    <div class="flex items-center gap-3">
+      <img src="logo.png" alt="DesignMirror" class="h-8 w-auto object-contain">
+      <span class="font-semibold text-lg tracking-tight">DesignMirror</span>
+    </div>
+    <nav class="flex items-center gap-1">
+      <a href="#analyze" class="px-3 py-1.5 rounded-full text-sm text-[#4d4d4d] hover:text-white hover:bg-[#1a1a1a] transition-all duration-200">Analyze</a>
+      <a href="#history" id="historyNav" class="px-3 py-1.5 rounded-full text-sm text-[#4d4d4d] hover:text-white hover:bg-[#1a1a1a] transition-all duration-200 flex items-center gap-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        History
+      </a>
+    </nav>
+  </header>
+
+  <main class="pt-16">
+
+    <!-- Hero - Asymmetric Layout -->
+    <section class="min-h-[100dvh] flex items-center relative overflow-hidden">
+      <!-- Background Gradient -->
+      <div class="absolute inset-0 bg-gradient-to-br from-[#0a0a0a] via-[#0a0a0a] to-[#0f0f12]"></div>
+      <div class="absolute top-1/4 right-0 w-[500px] h-[500px] bg-[#007cf0]/5 rounded-full blur-[120px] pointer-events-none"></div>
+
+      <div class="relative z-10 max-w-[1400px] mx-auto px-6 py-20 w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+          <!-- Left: Text Content -->
+          <div class="space-y-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#ebebeb]/10 bg-[#141414]">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#50e3c2] pulse-dot"></span>
+              <span class="text-xs text-[#888]">AI-Powered Design Analysis</span>
+            </div>
+
+            <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-[1.05]">
+              See a nice site,<br>
+              <span class="gradient-text">clone the design.</span>
+            </h1>
+
+            <p class="text-lg text-[#888] max-w-[480px] leading-relaxed">
+              Paste any URL and get instant design token extraction with copy-ready code.
+              Understand why something looks good and replicate it.
+            </p>
+
+            <!-- URL Input -->
+            <div class="flex gap-2 max-w-xl" id="inputSection">
+              <div class="flex-1 relative">
+                <input
+                  type="text"
+                  id="urlInput"
+                  placeholder="https://stripe.com"
+                  class="w-full h-12 px-4 bg-[#141414] border border-[#ebebeb]/10 rounded-xl text-white placeholder-[#888] outline-none transition-all duration-200 input-glow"
+                />
+              </div>
+              <button
+                id="analyzeBtn"
+                class="h-12 px-6 bg-white text-[#171717] rounded-xl font-medium text-sm flex items-center gap-2 hover:bg-[#f2f2f2] transition-all duration-200 magnetic-btn btn-press"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"/>
+                  <path d="m21 21-4.35-4.35"/>
+                </svg>
+                Analyze
+              </button>
+            </div>
+
+            <p class="text-xs text-[#888]">
+              Try: apple.com, vercel.com, linear.app, resend.com
+            </p>
+          </div>
+
+          <!-- Right: Visual Element -->
+          <div class="hidden lg:block relative">
+            <div class="relative w-full aspect-[4/3] rounded-3xl overflow-hidden border border-[#ebebeb]/10 bg-[#141414] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)]">
+              <!-- Mock UI Preview -->
+              <div class="absolute inset-0 p-8 space-y-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#007cf0] to-[#00dfd8]"></div>
+                  <div class="space-y-1">
+                    <div class="h-3 w-24 bg-[#ebebeb]/20 rounded"></div>
+                    <div class="h-2 w-16 bg-[#ebebeb]/10 rounded"></div>
+                  </div>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                  <div class="aspect-square rounded-xl bg-[#ebebeb]/5 float" style="animation-delay: 0s;"></div>
+                  <div class="aspect-square rounded-xl bg-[#ebebeb]/5 float" style="animation-delay: 0.2s;"></div>
+                  <div class="aspect-square rounded-xl bg-[#ebebeb]/5 float" style="animation-delay: 0.4s;"></div>
+                </div>
+                <div class="space-y-2">
+                  <div class="h-3 w-full bg-[#ebebeb]/10 rounded"></div>
+                  <div class="h-3 w-3/4 bg-[#ebebeb]/10 rounded"></div>
+                </div>
+                <div class="flex gap-2">
+                  <div class="h-8 w-24 rounded-lg bg-[#007cf0]/20"></div>
+                  <div class="h-8 w-24 rounded-lg bg-[#ebebeb]/10"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Floating Tokens -->
+            <div class="absolute -top-4 -right-4 px-3 py-1.5 rounded-lg bg-[#141414] border border-[#ebebeb]/10 shadow-lg float">
+              <code class="text-xs text-[#50e3c2]">--color-primary: #007cf0</code>
+            </div>
+            <div class="absolute -bottom-4 -left-4 px-3 py-1.5 rounded-lg bg-[#141414] border border-[#ebebeb]/10 shadow-lg float" style="animation-delay: 0.5s;">
+              <code class="text-xs text-[#ff0080]">--radius: 12px</code>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Analysis Section -->
+    <section id="analyze" class="py-24 relative">
+      <div class="max-w-[1400px] mx-auto px-6">
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+
+            <!-- Left: URL -->
+            <div class="space-y-6 fade-in">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-[#007cf0]/10 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#007cf0]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                  </svg>
+                </div>
+                <h2 class="text-2xl font-semibold tracking-tight">Analyzing</h2>
+              </div>
+              <div class="p-4 bg-[#141414] rounded-xl border border-[#ebebeb]/10">
+                <p class="text-sm text-[#888] truncate" id="analyzingUrl"></p>
+              </div>
+            </div>
+
+            <!-- Right: Progress -->
+            <div class="space-y-6 fade-in" style="animation-delay: 0.1s;">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-[#007cf0]/10 flex items-center justify-center spin">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#007cf0]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                  </svg>
+                </div>
+                <h2 class="text-2xl font-semibold tracking-tight">Processing</h2>
+              </div>
+              <div class="space-y-3">
+                <div class="h-2 rounded-full bg-[#1a1a1a] overflow-hidden">
+                  <div class="h-full w-1/2 rounded-full bg-gradient-to-r from-[#007cf0] to-[#00dfd8] shimmer"></div>
+                </div>
+                <p class="text-sm text-[#888]">Extracting design tokens via AI...</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div id="resultsSection" class="hidden">
+          <div class="space-y-12">
+
+            <!-- Result Header -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-[#50e3c2]/10 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#50e3c2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="text-2xl font-semibold tracking-tight">Analysis Complete</h2>
+                  <p class="text-sm text-[#888]" id="resultUrl"></p>
+                </div>
+              </div>
+              <button
+                onclick="copyAllTokens()"
+                class="px-4 py-2 bg-[#141414] border border-[#ebebeb]/10 rounded-lg text-sm text-[#888] hover:text-white hover:border-[#ebebeb]/20 transition-all duration-200 flex items-center gap-2 btn-press"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                </svg>
+                Copy All
+              </button>
+            </div>
+
+            <!-- Analysis Content -->
+            <div id="analysisContent" class="space-y-8">
+              <!-- Dynamically populated -->
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="hidden">
+          <div class="max-w-xl mx-auto text-center py-16 space-y-6">
+            <div class="w-16 h-16 rounded-2xl bg-[#ee0000]/10 flex items-center justify-center mx-auto">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-[#ee0000]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold">Analysis Failed</h3>
+              <p class="text-[#888] mt-2" id="errorMessage"></p>
+            </div>
+            <button
+              onclick="resetAnalyzer()"
+              class="px-6 py-3 bg-white text-[#171717] rounded-xl font-medium text-sm hover:bg-[#f2f2f2] transition-all duration-200 btn-press"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <div class="group p-6 rounded-2xl bg-[#141414] border border-[#ebebeb]/10 hover:border-[#ebebeb]/20 transition-all duration-300">
+              <div class="w-10 h-10 rounded-xl bg-[#007cf0]/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#007cf0]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 16v-4"/>
+                  <path d="M12 8h.01"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold mb-2">Design Language Parsing</h3>
+              <p class="text-sm text-[#888] leading-relaxed">Extract colors, typography, spacing and radius tokens. Understand why it looks good.</p>
+            </div>
+
+            <div class="group p-6 rounded-2xl bg-[#141414] border border-[#ebebeb]/10 hover:border-[#ebebeb]/20 transition-all duration-300">
+              <div class="w-10 h-10 rounded-xl bg-[#50e3c2]/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#50e3c2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <polyline points="16 18 22 12 16 6"/>
+                  <polyline points="8 6 2 12 8 18"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold mb-2">Code Generation</h3>
+              <p class="text-sm text-[#888] leading-relaxed">Get copy-ready HTML/CSS. Drop it into your project or hand it to AI for optimization.</p>
+            </div>
+
+            <div class="group p-6 rounded-2xl bg-[#141414] border border-[#ebebeb]/10 hover:border-[#ebebeb]/20 transition-all duration-300">
+              <div class="w-10 h-10 rounded-xl bg-[#ff0080]/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#ff0080]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold mb-2">Design Insights</h3>
+              <p class="text-sm text-[#888] leading-relaxed">Learn what techniques are worth adopting and which are anti-patterns to avoid.</p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Tokens Reference Section -->
+    <section id="tokens" class="py-24 bg-[#0f0f12]">
+      <div class="max-w-[1400px] mx-auto px-6">
+        <div class="mb-12">
+          <p class="text-xs font-medium text-[#888] uppercase tracking-wider mb-3">Design System</p>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Based on VOLTAgent Design Language</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+          <!-- Colors -->
+          <div class="p-6 rounded-2xl bg-[#141414] border border-[#ebebeb]/10">
+            <h3 class="text-sm font-medium text-[#888] mb-4">Colors</h3>
+            <div class="space-y-2">
+              <div class="flex items-center gap-3">
+                <div class="w-6 h-6 rounded-md bg-[#171717] border border-[#ebebeb]/10"></div>
+                <span class="text-xs text-[#888]">Primary #171717</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-6 h-6 rounded-md bg-[#0070f3]"></div>
+                <span class="text-xs text-[#888]">Link #0070f3</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-6 h-6 rounded-md bg-[#50e3c2]"></div>
+                <span class="text-xs text-[#888]">Cyan #50e3c2</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-6 h-6 rounded-md bg-[#7928ca]"></div>
+                <span class="text-xs text-[#888]">Violet #7928ca</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Typography -->
+          <div class="p-6 rounded-2xl bg-[#141414] border border-[#ebebeb]/10">
+            <h3 class="text-sm font-medium text-[#888] mb-4">Typography</h3>
+            <div class="space-y-3">
+              <div>
+                <p class="text-lg font-semibold tracking-tight">Geist Sans</p>
+                <p class="text-xs text-[#888] font-mono">Geist, system-ui</p>
+              </div>
+              <div>
+                <p class="text-lg font-mono">Geist Mono</p>
+                <p class="text-xs text-[#888] font-mono">ui-monospace</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Spacing -->
+          <div class="p-6 rounded-2xl bg-[#141414] border border-[#ebebeb]/10">
+            <h3 class="text-sm font-medium text-[#888] mb-4">Spacing</h3>
+            <div class="space-y-2">
+              <div class="flex items-center gap-3">
+                <div class="h-2 bg-gradient-to-r from-[#007cf0] to-[#00dfd8] rounded" style="width: 4px;"></div>
+                <span class="text-xs text-[#888]">xs: 8px</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="h-2 bg-gradient-to-r from-[#007cf0] to-[#00dfd8] rounded" style="width: 12px;"></div>
+                <span class="text-xs text-[#888]">sm: 12px</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="h-2 bg-gradient-to-r from-[#007cf0] to-[#00dfd8] rounded" style="width: 16px;"></div>
+                <span class="text-xs text-[#888]">md: 16px</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="h-2 bg-gradient-to-r from-[#007cf0] to-[#00dfd8] rounded" style="width: 24px;"></div>
+                <span class="text-xs text-[#888]">lg: 24px</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Radius -->
+          <div class="p-6 rounded-2xl bg-[#141414] border border-[#ebebeb]/10">
+            <h3 class="text-sm font-medium text-[#888] mb-4">Radius</h3>
+            <div class="space-y-3">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded bg-[#ebebeb]/10"></div>
+                <span class="text-xs text-[#888]">sm: 6px</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-[#ebebeb]/10"></div>
+                <span class="text-xs text-[#888]">md: 8px</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-[#ebebeb]/10"></div>
+                <span class="text-xs text-[#888]">lg: 12px</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-24">
+      <div class="max-w-[1400px] mx-auto px-6">
+        <div class="mb-12">
+          <p class="text-xs font-medium text-[#888] uppercase tracking-wider mb-3">Guide</p>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Three Steps to Design Mastery</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+          <div class="relative pl-8 border-l border-[#ebebeb]/10">
+            <div class="absolute -left-3 top-0 w-6 h-6 rounded-full bg-[#007cf0] flex items-center justify-center text-xs font-bold">1</div>
+            <h3 class="font-semibold mb-2">Copy the URL</h3>
+            <p class="text-sm text-[#888] leading-relaxed">Open any website you admire. Copy the URL from your browser's address bar.</p>
+          </div>
+
+          <div class="relative pl-8 border-l border-[#ebebeb]/10">
+            <div class="absolute -left-3 top-0 w-6 h-6 rounded-full bg-[#00dfd8] flex items-center justify-center text-xs font-bold text-[#171717]">2</div>
+            <h3 class="font-semibold mb-2">Paste and Submit</h3>
+            <p class="text-sm text-[#888] leading-relaxed">Paste the URL into the input and click Analyze. Our AI will fetch and inspect the page.</p>
+          </div>
+
+          <div class="relative pl-8 border-l border-[#ebebeb]/10">
+            <div class="absolute -left-3 top-0 w-6 h-6 rounded-full bg-[#50e3c2] flex items-center justify-center text-xs font-bold text-[#171717]">3</div>
+            <h3 class="font-semibold mb-2">Get the Code</h3>
+            <p class="text-sm text-[#888] leading-relaxed">View the extracted design tokens and copy the CSS. Apply the same design language to your project.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- History Section -->
+    <section id="history" class="py-24 bg-[#0f0f12] hidden">
+      <div class="max-w-[1400px] mx-auto px-6">
+        <div class="flex items-center justify-between mb-12">
+          <div>
+            <p class="text-xs font-medium text-[#888] uppercase tracking-wider mb-3">Saved</p>
+            <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Analysis History</h2>
+          </div>
+          <button onclick="closeHistory()" class="px-4 py-2 bg-[#141414] border border-[#ebebeb]/10 rounded-lg text-sm text-[#888] hover:text-white hover:border-[#ebebeb]/20 transition-all duration-200 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+            Close
+          </button>
+        </div>
+
+        <div id="historyList" class="space-y-3">
+          <!-- History items will be loaded here -->
+        </div>
+
+        <div id="historyEmpty" class="text-center py-16 hidden">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-[#888] mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <p class="text-[#888]">No analysis history yet</p>
+          <p class="text-sm text-[#666] mt-1">Your analyzed websites will appear here</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 bg-[#141414] border border-[#ebebeb]/10 rounded-full text-sm opacity-0 translate-y-2 transition-all duration-300 pointer-events-none z-50">
+    Copied to clipboard
+  </div>
+
+  <script>
+    const urlInput = document.getElementById('urlInput');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const emptyState = document.getElementById('emptyState');
+    const loadingState = document.getElementById('loadingState');
+    const resultsSection = document.getElementById('resultsSection');
+    const errorState = document.getElementById('errorState');
+    const analysisContent = document.getElementById('analysisContent');
+    const analyzingUrl = document.getElementById('analyzingUrl');
+    const resultUrl = document.getElementById('resultUrl');
+    const errorMessage = document.getElementById('errorMessage');
+    const toast = document.getElementById('toast');
+    const historyNav = document.getElementById('historyNav');
+    const historySection = document.getElementById('history');
+    const historyList = document.getElementById('historyList');
+    const historyEmpty = document.getElementById('historyEmpty');
+
+    let allTokens = '';
+    let currentAnalysisId = null;
+
+    // Handle Enter key
+    urlInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') analyzeUrl();
+    });
+
+    analyzeBtn.addEventListener('click', analyzeUrl);
+
+    // History navigation
+    historyNav.addEventListener('click', (e) => {
+      e.preventDefault();
+      loadHistory();
+      historySection.classList.remove('hidden');
+      historySection.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    async function loadHistory() {
+      try {
+        const response = await fetch('/api/history');
+        const data = await response.json();
+
+        if (data.history && data.history.length > 0) {
+          historyEmpty.classList.add('hidden');
+          historyList.classList.remove('hidden');
+          historyList.innerHTML = data.history.map(item => `
+            <div class="p-4 rounded-xl bg-[#141414] border border-[#ebebeb]/10 hover:border-[#ebebeb]/20 transition-all duration-200 cursor-pointer group" onclick='loadHistoryEntry(${item.id})'>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 flex-1 min-w-0">
+                  <div class="w-8 h-8 rounded-lg ${item.success ? 'bg-[#50e3c2]/10' : 'bg-[#ee0000]/10'} flex items-center justify-center flex-shrink-0">
+                    ${item.success ? `
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#50e3c2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                      </svg>
+                    ` : `
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#ee0000]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                      </svg>
+                    `}
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-medium truncate">${escapeHtml(item.url)}</p>
+                    <p class="text-xs text-[#888]">${item.timestamp}</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  ${item.success ? `<span class="text-xs text-[#888]">Click to view</span>` : `<span class="text-xs text-[#ee0000]">Failed</span>`}
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#888]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          historyEmpty.classList.remove('hidden');
+          historyList.classList.add('hidden');
+        }
+      } catch (error) {
+        console.error('Failed to load history:', error);
+      }
+    }
+
+    async function loadHistoryEntry(id) {
+      try {
+        const response = await fetch(`/api/history/${id}`);
+        const data = await response.json();
+
+        if (data.status === 'success' && data.entry.success) {
+          historySection.classList.add('hidden');
+          showResults(data.entry.analysis, data.entry.url, data.entry.id);
+        } else if (data.entry && !data.entry.success) {
+          historySection.classList.add('hidden');
+          showError(data.entry.analysis);
+        }
+      } catch (error) {
+        console.error('Failed to load history entry:', error);
+      }
+    }
+
+    function closeHistory() {
+      historySection.classList.add('hidden');
+    }
+
+    async function analyzeUrl() {
+      const url = urlInput.value.trim();
+      if (!url) {
+        showToast('Please enter a URL');
+        return;
+      }
+
+      // Normalize URL
+      let normalizedUrl = url;
+      if (!normalizedUrl.startsWith('http://') && !normalizedUrl.startsWith('https://')) {
+        normalizedUrl = 'https://' + normalizedUrl;
+      }
+
+      // Show loading
+      emptyState.classList.add('hidden');
+      resultsSection.classList.add('hidden');
+      errorState.classList.add('hidden');
+      historySection.classList.add('hidden');
+      loadingState.classList.remove('hidden');
+      analyzingUrl.textContent = normalizedUrl;
+
+      try {
+        const response = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: normalizedUrl })
+        });
+
+        const data = await response.json();
+
+        if (data.status === 'success') {
+          showResults(data.analysis, normalizedUrl, data.id);
+        } else {
+          showError(data.message || 'Analysis failed');
+        }
+      } catch (error) {
+        showError('Could not connect to analysis service. Make sure the server is running.');
+      }
+    }
+
+    function showResults(analysis, url, id = null) {
+      loadingState.classList.add('hidden');
+      resultsSection.classList.remove('hidden');
+      resultUrl.textContent = url;
+      currentAnalysisId = id;
+
+      // Parse and display analysis
+      allTokens = analysis;
+      analysisContent.innerHTML = `
+        <div class="p-6 rounded-2xl bg-[#141414] border border-[#ebebeb]/10">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold">Design Analysis</h3>
+            <button onclick="copyToClipboard(allTokens)" class="text-xs text-[#888] hover:text-white transition-colors">Copy</button>
+          </div>
+          <pre class="text-sm text-[#e0e0e0] leading-relaxed overflow-x-auto code-block">${escapeHtml(analysis)}</pre>
+        </div>
+      `;
+    }
+
+    function showError(message) {
+      loadingState.classList.add('hidden');
+      errorState.classList.remove('hidden');
+      errorMessage.textContent = message;
+    }
+
+    function resetAnalyzer() {
+      emptyState.classList.remove('hidden');
+      resultsSection.classList.add('hidden');
+      errorState.classList.add('hidden');
+      loadingState.classList.add('hidden');
+      urlInput.value = '';
+      urlInput.focus();
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Copied to clipboard');
+      });
+    }
+
+    function copyAllTokens() {
+      if (allTokens) copyToClipboard(allTokens);
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.remove('opacity-0', 'translate-y-2');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+      }, 2000);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+
+</body>
+</html>
