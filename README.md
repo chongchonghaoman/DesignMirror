@@ -6,6 +6,14 @@ Paste any URL, get instant design token extraction with copy-ready CSS. Understa
 
 ![DesignMirror Logo](logo.png)
 
+## Demo Video
+
+Watch the demo to see DesignMirror in action:
+
+[![DesignMirror Demo](https://img.shields.io/badge/Download%20Demo-MOV-blue)](https://github.com/chongchonghaoman/DesignMirror/releases/download/v1.0.0/DesignMirror-demo.mov)
+
+Or download directly: [DesignMirror-demo.mov](https://github.com/chongchonghaoman/DesignMirror/releases/download/v1.0.0/DesignMirror-demo.mov)
+
 ## Features
 
 - **Design Token Extraction** - Colors, fonts, spacing, border radius
